@@ -6,7 +6,16 @@
 
 #include <wincodec.h>
 #include <wincodecsdk.h>
-#include <atlbase.h>
+
+#include <comdef.h>
+_COM_SMARTPTR_TYPEDEF(IPropertyBag2,__uuidof(IPropertyBag2));
+_COM_SMARTPTR_TYPEDEF(IWICBitmapDecoder,__uuidof(IWICBitmapDecoder));
+_COM_SMARTPTR_TYPEDEF(IWICBitmapEncoder,__uuidof(IWICBitmapEncoder));
+_COM_SMARTPTR_TYPEDEF(IWICBitmapFrameDecode,__uuidof(IWICBitmapFrameDecode));
+_COM_SMARTPTR_TYPEDEF(IWICBitmapFrameEncode,__uuidof(IWICBitmapFrameEncode));
+_COM_SMARTPTR_TYPEDEF(IWICFormatConverter,__uuidof(IWICFormatConverter));
+_COM_SMARTPTR_TYPEDEF(IWICImagingFactory,__uuidof(IWICImagingFactory));
+
 #include <comutil.h>
 #pragma comment(lib, "WindowsCodecs.lib")
 #ifdef _DEBUG
@@ -125,13 +134,13 @@ void TVPLoadWIC(const GUID& guid, void *callbackdata, tTVPGraphicSizeCallback si
 		TVPThrowExceptionMessage( TJS_W("Unsupported color mode.") );
 	}
 
-	CComPtr<IWICBitmapDecoder> decoder;
-	HRESULT hr = decoder.CoCreateInstance(guid);
+	IWICBitmapDecoderPtr decoder;
+	HRESULT hr = CoCreateInstance(guid, NULL, CLSCTX_ALL, __uuidof(IWICBitmapDecoder), (void**)&decoder);
 	hr = decoder->Initialize( src, WICDecodeMetadataCacheOnDemand);
 	UINT frameCount = 0;
 	hr = decoder->GetFrameCount(&frameCount);
 	for( UINT index = 0; index < frameCount; ++index ) {
-		CComPtr<IWICBitmapFrameDecode> frame;
+		IWICBitmapFrameDecodePtr frame;
 		hr = decoder->GetFrame(index, &frame);
 		UINT width = 0;
 		UINT height = 0;
@@ -144,9 +153,9 @@ void TVPLoadWIC(const GUID& guid, void *callbackdata, tTVPGraphicSizeCallback si
 			sizecallback(callbackdata, width, height);
 			WICRect rect = {0, 0, width, height};
 			if( !IsEqualGUID( pixelFormat, GUID_WICPixelFormat32bppBGRA) ) {
-				CComPtr<IWICFormatConverter> converter;
-				CComPtr<IWICImagingFactory> wicFactory;
-				hr = wicFactory.CoCreateInstance( CLSID_WICImagingFactory );
+				IWICFormatConverterPtr converter;
+				IWICImagingFactoryPtr wicFactory;
+				hr = CoCreateInstance(CLSID_WICImagingFactory, NULL, CLSCTX_ALL, __uuidof(IWICImagingFactory), (void**)&wicFactory);
 				wicFactory->CreateFormatConverter(&converter);
 				converter->Initialize(frame, GUID_WICPixelFormat32bppBGRA,WICBitmapDitherTypeNone, NULL, 0.0f, WICBitmapPaletteTypeCustom);
 				hr = converter->CopyPixels( &rect, stride, stride*height, (BYTE*)&buff[0] );
@@ -179,8 +188,8 @@ void TVPLoadTIFF(void* formatdata, void *callbackdata, tTVPGraphicSizeCallback s
 }
 
 void TVPLoadHeaderWIC(const GUID& guid, struct IStream* stream, iTJSDispatch2** dic ) {
-	CComPtr<IWICBitmapDecoder> decoder;
-	HRESULT hr = decoder.CoCreateInstance(guid);
+	IWICBitmapDecoderPtr decoder;
+	HRESULT hr = CoCreateInstance(guid, NULL, CLSCTX_ALL, __uuidof(IWICBitmapDecoder), (void**)&decoder);
 	if( SUCCEEDED(hr) ) hr = decoder->Initialize( stream, WICDecodeMetadataCacheOnDemand);
 	UINT frameCount = 0;
 	if( SUCCEEDED(hr) ) hr = decoder->GetFrameCount(&frameCount);
@@ -189,7 +198,7 @@ void TVPLoadHeaderWIC(const GUID& guid, struct IStream* stream, iTJSDispatch2** 
 			UINT width = 0;
 			UINT height = 0;
 			//GUID pixelFormat = { 0 };
-			CComPtr<IWICBitmapFrameDecode> frame;
+			IWICBitmapFrameDecodePtr frame;
 			if( SUCCEEDED(hr) ) hr = decoder->GetFrame(index, &frame);
 			//if( SUCCEEDED(hr) ) hr = frame->GetPixelFormat(&pixelFormat);
 			if( SUCCEEDED(hr) ) hr = frame->GetSize(&width, &height);
@@ -218,11 +227,11 @@ void TVPLoadHeaderTIFF(void* formatdata, struct IStream* src, iTJSDispatch2** di
 	TVPLoadHeaderWIC( CLSID_WICTiffDecoder, src, dic );
 }
 void TVPSaveAsWIC(const GUID& guid, void* callbackdata, IStream* stream, const ttstr & mode, tjs_uint width, tjs_uint height, tTVPGraphicSaveScanLineCallback scanlinecallback, iTJSDispatch2* meta ) {
-	CComPtr<IWICBitmapEncoder> encoder;
-	HRESULT hr = encoder.CoCreateInstance(guid);
+	IWICBitmapEncoderPtr encoder;
+	HRESULT hr = CoCreateInstance(guid, NULL, CLSCTX_ALL, __uuidof(IWICBitmapEncoder), (void**)&encoder);
 	if( SUCCEEDED(hr) ) hr = encoder->Initialize(stream, WICBitmapEncoderNoCache);
-	CComPtr<IPropertyBag2> property;
-	CComPtr<IWICBitmapFrameEncode> frame;
+	IPropertyBag2Ptr property;
+	IWICBitmapFrameEncodePtr frame;
 	if( SUCCEEDED(hr) ) hr = encoder->CreateNewFrame( &frame, &property );
 	WICPixelFormatGUID format = GUID_WICPixelFormat32bppBGRA;
 	if( SUCCEEDED(hr) ) hr = frame->Initialize( property );
