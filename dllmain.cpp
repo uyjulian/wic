@@ -151,7 +151,7 @@ void TVPLoadWIC(const GUID& guid, void *callbackdata, tTVPGraphicSizeCallback si
 		tjs_uint8* buff = new tjs_uint8[stride*height];
 		try {
 			sizecallback(callbackdata, width, height);
-			WICRect rect = {0, 0, width, height};
+			WICRect rect = {0, 0, (INT)width, (INT)height};
 			if( !IsEqualGUID( pixelFormat, GUID_WICPixelFormat32bppBGRA) ) {
 				IWICFormatConverterPtr converter;
 				IWICImagingFactoryPtr wicFactory;
