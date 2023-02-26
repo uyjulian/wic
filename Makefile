@@ -1,9 +1,7 @@
 
 SOURCES += dllmain.cpp
 
-INCFLAGS += -Isrc
-
-LDLIBS += -lole32 -loleaut32 -luuid -lstrmiids -lquartz
+LDLIBS += -lole32 -luuid
 
 PROJECT_BASENAME = krwic
 
