@@ -1,22 +1,22 @@
 Title: WIC plugin
 Author: Takenori Imoto
 
-������͂ȂɁH
+●これはなに？
 
-Windows Imaging Component (WIC) ���g���ĉ摜�̓ǂݏ������s���v���O�C���ł��B
+Windows Imaging Component (WIC) を使って画像の読み書きを行うプラグインです。
 
-���̃v���O�C����ǂݍ��ނ�GIF/ICO/TIFF�̓ǂݍ��݂ƁATIFF�̏����o���ɑΉ�����B
+このプラグインを読み込むとGIF/ICO/TIFFの読み込みと、TIFFの書き出しに対応する。
 
-WIC �ł́ABMP/JPEG/PNG/HD Photo(JPEG XR) ���Ή����Ă��邪�A������͖{�̂̋@�\�œǂݏ�������B
-DDS ���Ή����Ă��邪�AWindows 8.1 �ȍ~�Ȃ̂Ō��݂̂Ƃ��낱�̃v���O�C���ł̓T�|�[�g���Ă��Ȃ��B
+WIC では、BMP/JPEG/PNG/HD Photo(JPEG XR) も対応しているが、こちらは本体の機能で読み書きする。
+DDS も対応しているが、Windows 8.1 以降なので現在のところこのプラグインではサポートしていない。
 
 
-���g����
+●使い方
 Plugins.link("krwic.dll");
-�ƋL�q����΁A�����I�ɃT�|�[�g����摜�t�H�[�}�b�g��������B
+と記述すれば、自動的にサポートする画像フォーマットが増える。
 
 
-�����C�Z���X
+●ライセンス
 
-���̃v���O�C���̃��C�Z���X�͋g���g���{�̂ɏ������Ă��������B
+このプラグインのライセンスは吉里吉里本体に準拠してください。
 
